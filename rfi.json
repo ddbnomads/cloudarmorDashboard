@@ -1,0 +1,14 @@
+#gcloud logging metrics create rfi --config-from-file=rfi.json
+{
+  "name": "projects/*/metricDescriptors/logging.googleapis.com/user/rfi",
+  "description": "RFI",
+  "filter": jsonPayload.enforcedSecurityPolicy.preconfiguredExprIds \=\~ \"rfi\" OR jsonPayload.previewSecurityPolicy.preconfiguredExprIds
+  \=\~ \"rfi\",
+  "metricDescriptor": {
+
+  "metricKind": "DELTA",
+  "type": "logging.googleapis.com/user/rfi",
+  "unit": "1",
+  "valueType": "INT64"
+  },
+}

@@ -1,0 +1,14 @@
+#gcloud logging metrics create sqli --config-from-file=sqli.json
+{
+  "name": "projects/*/metricDescriptors/logging.googleapis.com/user/sqli",
+  "description": "SQLi",
+  "filter": jsonPayload.enforcedSecurityPolicy.preconfiguredExprIds \=\~ \"sqli\" OR jsonPayload.previewSecurityPolicy.preconfiguredExprIds
+  \=\~ \"sqli\",
+  "metricDescriptor": {
+
+  "metricKind": "DELTA",
+  "type": "logging.googleapis.com/user/sqli",
+  "unit": "1",
+  "valueType": "INT64"
+  },
+}

@@ -1,0 +1,41 @@
+#gcloud logging metrics create adaptive_protection --config-from-file=adaptive_protection.json
+
+{
+"name": "adaptive_protection",
+"description": "Info for adaptive protection alerts",
+"filter": "resource.type=\"network_security_policy\"\n
+  severity=WARNING\n",
+"metricDescriptor": {
+  "description": "Info for adaptive protection alerts",
+  "name": "projects/*/metricDescriptors/logging.googleapis.com/user/adaptive_protection",
+  "labels":[
+  { "key": "timestamp" },
+  { "key": "rule_expression"},
+  { "key": "attackSize"},
+  {"key": "ruleStatus"},
+  {"key": "backendService"},
+  {
+    "key": "autodeploy",
+    "valueType": "BOOL"
+    },
+    {"key": "confidence"},
+    {"key": "attackSignatures"},
+    {"key": "alert_id"}
+  ],
+  "metricKind": "DELTA",
+  "type": "logging.googleapis.com/user/adaptive_protection",
+  "unit": "1",
+  "valueType": "INT64"
+},
+"labelExtractors": {
+  "alert_id": "EXTRACT(jsonPayload.alertId)",
+  "attackSignatures": "EXTRACT(jsonPayload.headerSignatures)",
+  "attackSize": "EXTRACT(jsonPayload.attackSize)",
+  "autodeploy": "EXTRACT(jsonPayload.autoDeploy)",
+  "backendService": "EXTRACT(jsonPayload.backendService)",
+  "confidence": "EXTRACT(jsonPayload.confidence)",
+  "ruleStatus": "EXTRACT(jsonPayload.ruleStatus)",
+  "rule_expression": "EXTRACT(jsonPayload.suggestedRule.0.expression)",
+  "timestamp": "EXTRACT(timestamp)"
+  },
+}

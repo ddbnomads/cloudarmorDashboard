@@ -1,0 +1,199 @@
+{
+  "category": "CUSTOM",
+  "dashboardFilters": [],
+  "displayName": "Cloud Armor DDOS Visibility - L3/L4 DDoS attack attempts on the Global Application LB",
+  "etag": "8b81a60b206a152a0a4aaf1659703d0e",
+  "labels": {},
+  "mosaicLayout": {
+    "columns": 48,
+    "tiles": [
+      {
+        "height": 16,
+        "widget": {
+          "title": "Protected Network Endpoint - Ingress bytes [SUM]",
+          "xyChart": {
+            "chartOptions": {
+              "mode": "COLOR"
+            },
+            "dataSets": [
+              {
+                "breakdowns": [],
+                "dimensions": [],
+                "measures": [],
+                "minAlignmentPeriod": "60s",
+                "plotType": "LINE",
+                "targetAxis": "Y1",
+                "timeSeriesQuery": {
+                  "apiSource": "DEFAULT_CLOUD",
+                  "timeSeriesFilter": {
+                    "aggregation": {
+                      "alignmentPeriod": "60s",
+                      "crossSeriesReducer": "REDUCE_SUM",
+                      "groupByFields": [
+                        "metric.label.\"drop_status\""
+                      ],
+                      "perSeriesAligner": "ALIGN_RATE"
+                    },
+                    "filter": "metric.type=\"networksecurity.googleapis.com/dos/ingress_bytes_count\" resource.type=\"networksecurity.googleapis.com/ProtectedEndpoint\""
+                  }
+                }
+              }
+            ],
+            "thresholds": [],
+            "yAxis": {
+              "label": "",
+              "scale": "LINEAR"
+            }
+          }
+        },
+        "width": 24,
+        "xPos": 24,
+        "yPos": 0
+      },
+      {
+        "height": 16,
+        "widget": {
+          "title": "Ingress packets [SUM]",
+          "xyChart": {
+            "chartOptions": {
+              "mode": "COLOR"
+            },
+            "dataSets": [
+              {
+                "breakdowns": [],
+                "dimensions": [],
+                "measures": [],
+                "minAlignmentPeriod": "60s",
+                "plotType": "LINE",
+                "targetAxis": "Y1",
+                "timeSeriesQuery": {
+                  "apiSource": "DEFAULT_CLOUD",
+                  "timeSeriesFilter": {
+                    "aggregation": {
+                      "alignmentPeriod": "60s",
+                      "crossSeriesReducer": "REDUCE_SUM",
+                      "groupByFields": [
+                        "metric.label.\"drop_status\""
+                      ],
+                      "perSeriesAligner": "ALIGN_RATE"
+                    },
+                    "filter": "metric.type=\"networksecurity.googleapis.com/dos/ingress_packets_count\" resource.type=\"networksecurity.googleapis.com/ProtectedEndpoint\""
+                  }
+                }
+              }
+            ],
+            "thresholds": [],
+            "yAxis": {
+              "label": "",
+              "scale": "LINEAR"
+            }
+          }
+        },
+        "width": 24,
+        "xPos": 0,
+        "yPos": 0
+      },
+      {
+        "height": 16,
+        "widget": {
+          "title": "Ingress packets By VIP",
+          "xyChart": {
+            "chartOptions": {
+              "mode": "COLOR"
+            },
+            "dataSets": [
+              {
+                "breakdowns": [],
+                "dimensions": [],
+                "measures": [],
+                "minAlignmentPeriod": "60s",
+                "plotType": "LINE",
+                "targetAxis": "Y1",
+                "timeSeriesQuery": {
+                  "apiSource": "DEFAULT_CLOUD",
+                  "timeSeriesFilter": {
+                    "aggregation": {
+                      "alignmentPeriod": "60s",
+                      "crossSeriesReducer": "REDUCE_SUM",
+                      "groupByFields": [
+                        "metric.label.\"drop_status\"",
+                        "resource.label.\"vip\""
+                      ],
+                      "perSeriesAligner": "ALIGN_RATE"
+                    },
+                    "filter": "metric.type=\"networksecurity.googleapis.com/dos/ingress_packets_count\" resource.type=\"networksecurity.googleapis.com/ProtectedEndpoint\""
+                  }
+                }
+              }
+            ],
+            "thresholds": [],
+            "yAxis": {
+              "label": "",
+              "scale": "LINEAR"
+            }
+          }
+        },
+        "width": 24,
+        "xPos": 0,
+        "yPos": 16
+      },
+      {
+        "height": 16,
+        "widget": {
+          "title": "Protected Network Endpoint - Ingress bytes by VIP",
+          "xyChart": {
+            "chartOptions": {
+              "mode": "COLOR"
+            },
+            "dataSets": [
+              {
+                "breakdowns": [],
+                "dimensions": [],
+                "measures": [],
+                "minAlignmentPeriod": "60s",
+                "plotType": "LINE",
+                "targetAxis": "Y1",
+                "timeSeriesQuery": {
+                  "apiSource": "DEFAULT_CLOUD",
+                  "timeSeriesFilter": {
+                    "aggregation": {
+                      "alignmentPeriod": "60s",
+                      "crossSeriesReducer": "REDUCE_SUM",
+                      "groupByFields": [
+                        "metric.label.\"drop_status\"",
+                        "resource.label.\"vip\""
+                      ],
+                      "perSeriesAligner": "ALIGN_RATE"
+                    },
+                    "filter": "metric.type=\"networksecurity.googleapis.com/dos/ingress_bytes_count\" resource.type=\"networksecurity.googleapis.com/ProtectedEndpoint\""
+                  }
+                }
+              }
+            ],
+            "thresholds": [],
+            "yAxis": {
+              "label": "",
+              "scale": "LINEAR"
+            }
+          }
+        },
+        "width": 24,
+        "xPos": 24,
+        "yPos": 16
+      },
+      {
+        "height": 23,
+        "widget": {
+          "logsPanel": {
+            "filter": "resource.type=\"networksecurity.googleapis.com/ProtectedEndpoint\"\nseverity=(EMERGENCY OR ALERT OR CRITICAL OR ERROR OR WARNING)\n",
+            "resourceNames": []
+          },
+          "title": "DDoS Visibility logs"
+        },
+        "width": 30,
+        "xPos": 0,
+        "yPos": 32
+      }
+    ]
+  }
+}

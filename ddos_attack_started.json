@@ -1,0 +1,69 @@
+#gcloud logging metrics create ddos_attack_started --config-from-file=ddos_attack_started.json
+
+{
+"name": "ddos_attack_started",
+"description": "L3L4 mitigation events",
+"filter": 
+  "resource.type=\"networksecurity.googleapis.com/ProtectedEndpoint\"\n
+  jsonPayload.mitigationType=\"MITIGATION_STARTED\" OR jsonPayload.mitigationType=\"MITIGATION_ENDED\" OR jsonPayload.mitigationType=\"MITIGATION_ONGOING\"\n",
+"metricDescriptor": {
+    "description": "Logs of when a DDOS attack started",
+    "labels": [
+    {
+        "key": "total_volume_pps",
+        "valueType": "INT64"
+    },
+    {
+        "description": "Name of Incident",
+        "key": "mitigation_incident_name"
+    },
+    {
+        "key": "attack_volume_pps",
+        "valueType": "INT64"
+    },
+    {
+        "description": "notification when an attack starts",
+        "key": "mitigation_started"
+    },
+    {
+        "key": "total_volume_bps",
+        "valueType": "INT64"
+    },
+    {
+        "description": "IP Address getting attacked",
+        "key": "target_vip"
+    },
+    {
+        "key": "alert_id"
+    },
+    {
+        "key": "attack_duration",
+        "valueType": "INT64"
+    },
+    {
+        "key": "timestamp"
+    },
+    {
+        "key": "attack_volume_bps",
+        "valueType": "INT64"
+    }
+    ], 
+    "metricKind": "DELTA",
+    "name": "projects/*/metricDescriptors/logging.googleapis.com/user/ddos_attack_started",
+    "type": "logging.googleapis.com/user/ddos_attack_started",
+    "unit": "1",
+    "valueType": "INT64"
+    },
+    "labelExtractors": {
+    "alert_id": "EXTRACT(jsonPayload.id)",
+    "attack_duration": "EXTRACT(jsonPayload.ended.attack_duration_seconds)",
+    "attack_volume_bps": "EXTRACT(jsonPayload.ongoing.total_attack_volume.bps)",
+    "attack_volume_pps": "EXTRACT(jsonPayload.ongoing.total_attack_volume.pps)",
+    "mitigation_incident_name": "EXTRACT(jsonPayload.id)",
+    "mitigation_started": "EXTRACT(jsonPayload.mitigationType)",
+    "target_vip": "EXTRACT(jsonPayload.targetVip)",
+    "timestamp": "EXTRACT(timestamp)",
+    "total_volume_bps": "EXTRACT(jsonPayload.total_volume.bps)",
+    "total_volume_pps": "EXTRACT(jsonPayload.total_volume.pps)"
+    },
+}

@@ -1,0 +1,25 @@
+# gcloud alpha monitoring policies create --policy-from-file=Layer_3_Layer_4_DDOS_Alert.json
+
+{
+  "name": "projects/*/alertPolicies/11176330617161177580",
+  "displayName": "Layer 3/Layer 4 DDOS Alert",
+  "conditions": [
+    {
+      "name": "projects/*/alertPolicies/11176330617161177580/conditions/11176330617161175091",
+      "displayName": "Log match condition",
+      "conditionMatchedLog": {
+        "filter": "resource.type=\"networksecurity.googleapis.com/ProtectedEndpoint\"\njsonPayload.mitigationType=\"MITIGATION_STARTED\" OR jsonPayload.mitigationType=\"MITIGATION_ENDED\" OR jsonPayload.mitigationType=\"MITIGATION_STARTED\"\n"
+      }
+    }
+  ],
+  "alertStrategy": {
+    "notificationRateLimit": {
+      "period": "3600s"
+    },
+    "autoClose": "604800s"
+  },
+  "combiner": "OR",
+  "enabled": true,
+  "notificationChannels": [],
+  
+}

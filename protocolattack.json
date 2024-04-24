@@ -1,0 +1,14 @@
+#gcloud logging metrics create rce --config-from-file=rce.json
+{
+  "name": "projects/*/metricDescriptors/logging.googleapis.com/user/rce",
+  "description": "RCE",
+  "filter": jsonPayload.enforcedSecurityPolicy.preconfiguredExprIds \=\~ \"protocolattack\" OR jsonPayload.previewSecurityPolicy.preconfiguredExprIds
+  \=\~ \"protocolattack\",
+  "metricDescriptor": {
+
+  "metricKind": "DELTA",
+  "type": "logging.googleapis.com/user/protocolattack",
+  "unit": "1",
+  "valueType": "INT64"
+  },
+}

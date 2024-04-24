@@ -1,0 +1,32 @@
+# gcloud alpha monitoring policies create --policy-from-file=php_alert.json
+
+{
+  "displayName": "projects/*/alertPolicies/8151589516015903944",
+  "userLabels": {},
+  "conditions": [
+    {
+      "displayName": "New condition",
+      "conditionThreshold": {
+        "filter": "metric.type=\"logging.googleapis.com/user/php\"",
+        "aggregations": [
+          {
+            "alignmentPeriod": "600s",
+            "crossSeriesReducer": "REDUCE_SUM",
+            "perSeriesAligner": "ALIGN_DELTA"
+          }
+        ],
+        "comparison": "COMPARISON_GT",
+        "duration": "0s",
+        "trigger": {
+          "count": 1
+        }
+      }
+    }
+  ],
+  "alertStrategy": {
+    "autoClose": "604800s"
+  },
+  "combiner": "OR",
+  "enabled": true,
+  "notificationChannels": []
+}

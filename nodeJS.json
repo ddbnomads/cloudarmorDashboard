@@ -1,0 +1,14 @@
+#gcloud logging metrics create nodejs --config-from-file=nodeJS.json
+{
+  "name": "projects/*/metricDescriptors/logging.googleapis.com/user/nodeJS",
+  "description": "NodeJS",
+  "filter": jsonPayload.enforcedSecurityPolicy.preconfiguredExprIds \=\~ \"nodejs\" OR jsonPayload.previewSecurityPolicy.preconfiguredExprIds
+  \=\~ \"nodejs\",
+  "metricDescriptor": {
+
+  "metricKind": "DELTA",
+  "type": "logging.googleapis.com/user/nodejs",
+  "unit": "1",
+  "valueType": "INT64"
+  },
+}

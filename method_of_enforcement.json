@@ -1,0 +1,14 @@
+#gcloud logging metrics create method_of_enforcement --config-from-file=method_of_enforcement.json
+{
+  "name": "projects/*/metricDescriptors/logging.googleapis.com/user/method_of_enforcement",
+  "description": "Method of Enforcement",
+  "filter": jsonPayload.enforcedSecurityPolicy.preconfiguredExprIds \=\~ \"method_of_enforcement\" OR jsonPayload.previewSecurityPolicy.preconfiguredExprIds
+  \=\~ \"method_of_enforcement\",
+  "metricDescriptor": {
+
+  "metricKind": "DELTA",
+  "type": "logging.googleapis.com/user/method_of_enforcement",
+  "unit": "1",
+  "valueType": "INT64"
+  },
+}

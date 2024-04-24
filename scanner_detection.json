@@ -1,0 +1,14 @@
+#gcloud logging metrics create scanner_detection --config-from-file=scanner_detection.json
+{
+  "name": "projects/*/metricDescriptors/logging.googleapis.com/user/scanner_detection",
+  "description": "Scanner Detection",
+  "filter": jsonPayload.enforcedSecurityPolicy.preconfiguredExprIds \=\~ \"scanner_detection\" OR jsonPayload.previewSecurityPolicy.preconfiguredExprIds
+  \=\~ \"scanner_detection\",
+  "metricDescriptor": {
+
+  "metricKind": "DELTA",
+  "type": "logging.googleapis.com/user/scanner_detection",
+  "unit": "1",
+  "valueType": "INT64"
+  },
+}

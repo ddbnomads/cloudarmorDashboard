@@ -1,0 +1,59 @@
+#gcloud logging metrics create cloud_armor_feed --config-from-file=cloud_armor_feed.json
+{
+  "name": "cloud_armor_feed",
+  "description": "Cloud Armor Feed",
+  "filter": "resource.type=\"http_load_balancer\"\n",
+  "metricDescriptor": {
+    "name": "projects/*/metricDescriptors/logging.googleapis.com/user/cloud_armor_feed",
+    "labels": [
+      {
+        "key": "user_agent",
+        "description": "User Agent"
+      },
+      {
+        "key": "URL",
+        "description": "request url"
+      },
+      {
+        "key": "referer",
+        "description": "referrer_value"
+      },
+      {
+        "key": "denied_by_cloud_armor",
+        "description": "Cloud Armor Action"
+      },
+      {
+        "key": "CloudArmorRuleTriggered",
+        "description": "Rule number that triggered"
+      },
+      {
+        "key": "deny_reason",
+        "description": "Policy Name"
+      },
+      {
+        "key": "request_method",
+        "description": "request method"
+      },
+      {
+        "key": "client_ip",
+        "description": "client ip address"
+      }
+    ],
+    "metricKind": "DELTA",
+    "valueType": "INT64",
+    "unit": "1",
+    "description": "Cloud Armor Feed",
+    "type": "logging.googleapis.com/user/cloud_armor_feed"
+  },
+  "labelExtractors": {
+    "request_method": "EXTRACT(httpRequest.requestMethod)",
+    "deny_reason": "EXTRACT(jsonPayload.enforcedSecurityPolicy.name)",
+    "URL": "EXTRACT(httpRequest.requestUrl)",
+    "user_agent": "EXTRACT(httpRequest.userAgent)",
+    "client_ip": "EXTRACT(jsonPayload.remoteIp)",
+    "denied_by_cloud_armor": "EXTRACT(jsonPayload.enforcedSecurityPolicy.configuredAction)",
+    "CloudArmorRuleTriggered": "EXTRACT(jsonPayload.enforcedSecurityPolicy.priority)",
+    "referer": "EXTRACT(httpRequest.referer)"
+  },
+}
+
