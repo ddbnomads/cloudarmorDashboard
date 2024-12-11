@@ -1,0 +1,60 @@
+#gcloud logging metrics create preview_ca_rules --config-from-file=preview_ca_rules.json
+
+# creates feed for preview cloud armor rules so you can see details of request
+{
+  "name": "ca_preview_rule_details",
+  "description": "Cloud Armor preview rules",
+  "filter": "resource.type=\"http_load_balancer\"\n",
+  "metricDescriptor": 
+    {
+      "name": "projects/lab-kk/metricDescriptors/logging.googleapis.com/user/ca_preview_rule_details",
+      "labels": [
+        {
+          "key": "preview_field_type",
+          "description": "CA preview field type"
+        },
+        {
+          "key": "preview_ca_rule_priority",
+          "description": "CA preview rule number "
+        },
+        {
+          "key": "preview_field_length",
+          "description": "CA preview field length"
+        },
+        {
+          "key": "preview_field_value",
+          "description": "CA preview field value"
+        },
+        {
+          "key": "preview_owasp_rule",
+          "description": "CA preview owasp rule"
+        },
+        {
+          "key": "preview_length",
+          "description": "CA preview length"
+        },
+        {
+          "key": "policy_name",
+          "description": "policy name"
+        },
+        {
+          "key": "preview_configuration_action",
+          "description": "CA Preview Action"
+        }
+      ],
+      "metricKind": "DELTA",
+      "valueType": "INT64",
+      "unit": "1",
+      "type": "logging.googleapis.com/user/preview_rule_details"
+    },
+    "labelExtractors": {
+     "policy_name": "EXTRACT(jsonPayload.previewSecurityPolicy.name)",
+     "preview_ca_rule_priority": "EXTRACT(jsonPayload.previewSecurityPolicy.priority)",
+     "preview_configuration_action": "EXTRACT(jsonPayload.previewSecurityPolicy.configuredAction)",
+     "preview_field_length": "EXTRACT(jsonPayload.enforcedSecurityPolicy.matchedFieldLength)",
+     "preview_field_type": "EXTRACT(jsonPayload.previewSecurityPolicy.matchedFieldType)",
+     "preview_field_value": "EXTRACT(jsonPayload.previewSecurityPolicy.matchedFieldValue)",
+     "preview_length": "EXTRACT(jsonPayload.previewSecurityPolicy.matchedLength)",
+     "preview_owasp_rule": "EXTRACT(jsonPayload.previewSecurityPolicy.preconfiguredExprIds)"
+    },
+  }
