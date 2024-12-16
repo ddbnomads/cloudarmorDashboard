@@ -1,0 +1,1185 @@
+{
+  "displayName": "Cloud Armor WAF Dashboard",
+  "mosaicLayout": {
+    "columns": 48,
+    "tiles": [
+      {
+        "yPos": 119,
+        "width": 48,
+        "height": 27,
+        "widget": {
+          "timeSeriesTable": {
+            "dataSets": [
+              {
+                "timeSeriesQuery": {
+                  "opsAnalyticsQuery": {
+                    "savedQueryId": "",
+                    "sql": "SELECT\n  timestamp, http_request.request_method, http_request.status,\n  http_request.request_url, \n  --http_request.request_size,\n  \n  --http_request.response_size,\n  http_request.user_agent,\n  http_request.remote_ip,\n -- http_request.server_ip,\n  http_request.referer,\n  json_value(json_payload.securityPolicyRequestData.remoteIpInfo.regionCode) as regionCode,\n  json_value(json_payload.securityPolicyRequestData.tlsJa3Fingerprint) as Ja3Fingerprint,\n  json_value(json_payload.enforcedSecurityPolicy.name) as Security_Policy,\n  json_value(json_payload.enforcedSecurityPolicy.priority) as Rule_Priority,\n  json_value(json_payload.enforcedSecurityPolicy.configuredAction) as Rule_Action,\n  json_value(json_payload.enforcedSecurityPolicy.preconfiguredExprIds.0) as preconfiguredExprIds,\n  json_value(json_payload.previewSecurityPolicy.name) as Preview_Security_Policy,\n  json_value(json_payload.previewSecurityPolicy.priority) as Preview_Rule_Priority,\n  json_value(json_payload.previewSecurityPolicy.configuredAction) as Preview_Rule_Action,\n  --json_payload.previewSecurityPolicy\n  \nFROM\n  `lab-kk.global._Default._AllLogs`\n  where resource.type = 'http_load_balancer' --and severity = 'WARNING'\n  and (json_payload.enforcedSecurityPolicy.name is not null OR json_payload.previewSecurityPolicy.name is not null)\n  and\n  IF(\n    ARRAY_LENGTH(@Security_Policy) = 0,\n    TRUE,\n   json_value(json_payload.enforcedSecurityPolicy.name) IN UNNEST(@Security_Policy)\n  )\n  and \n\n  IF(\n    ARRAY_LENGTH(@Backend_name) = 0,\n    TRUE,\n    json_value(resource.labels.backend_service_name) IN UNNEST(@Backend_name)\n  )\n  and\n  IF(\n    ARRAY_LENGTH(@Region_Code) = 0,\n    TRUE,\n    json_value(json_payload.securityPolicyRequestData.remoteIpInfo.regionCode) IN UNNEST(@Region_Code)\n  )\norder by timestamp desc\nLIMIT 50",
+                    "queryHandle": "CgjGfxGTbO0w4BIgam9iX0RPZFBRbm8tM0swOWUyMGpvZG9PaDFDRzQxZUoaAlVTQLzcs9y_FA"
+                  },
+                  "unitOverride": "",
+                  "outputFullDuration": false
+                },
+                "tableTemplate": "",
+                "minAlignmentPeriod": "0s"
+              }
+            ],
+            "metricVisualization": "NUMBER",
+            "columnSettings": [],
+            "opsAnalyticsSettings": {
+              "maxRows": "0",
+              "showFilterBar": false,
+              "pageSize": "0"
+            },
+            "displayColumnType": false
+          },
+          "title": "Last 50 requests through Cloud Armor",
+          "id": ""
+        }
+      },
+      {
+        "yPos": 52,
+        "width": 33,
+        "height": 10,
+        "widget": {
+          "xyChart": {
+            "dataSets": [
+              {
+                "timeSeriesQuery": {
+                  "opsAnalyticsQuery": {
+                    "savedQueryId": "",
+                    "sql": "SELECT\n  count(timestamp) as requests, \n  \n  http_request.referer,\n \nFROM\n  `lab-kk.global._Default._AllLogs`\nWHERE\n  resource.type = 'http_load_balancer' \n  and\n  IF(\n    ARRAY_LENGTH(@Security_Policy) = 0,\n    TRUE,\n   json_value(json_payload.enforcedSecurityPolicy.name) IN UNNEST(@Security_Policy)\n  )\n  and \n\n  IF(\n    ARRAY_LENGTH(@Backend_name) = 0,\n    TRUE,\n    json_value(resource.labels.backend_service_name) IN UNNEST(@Backend_name)\n  )\nand\n  IF(\n    ARRAY_LENGTH(@Region_Code) = 0,\n    TRUE,\n    JSON_VALUE(json_payload.securityPolicyRequestData.remoteIpInfo.regionCode) IN UNNEST(@Region_Code)\n  )\n\nGROUP BY\n  2,\n  timestamp\nORDER BY\n  timestamp DESC\n  --LIMIT 100",
+                    "queryHandle": ""
+                  },
+                  "unitOverride": "",
+                  "outputFullDuration": false
+                },
+                "plotType": "STACKED_BAR",
+                "legendTemplate": "",
+                "targetAxis": "Y1",
+                "dimensions": [
+                  {
+                    "column": "referer",
+                    "columnType": "STRING",
+                    "maxBinCount": 5,
+                    "sortOrder": "SORT_ORDER_ASCENDING",
+                    "sortColumn": "referer"
+                  }
+                ],
+                "measures": [
+                  {
+                    "column": "requests",
+                    "aggregationFunction": {
+                      "type": "count",
+                      "parameters": []
+                    }
+                  }
+                ],
+                "breakdowns": []
+              }
+            ],
+            "thresholds": [],
+            "yAxis": {
+              "label": "",
+              "scale": "LINEAR"
+            },
+            "chartOptions": {
+              "mode": "COLOR",
+              "showLegend": false,
+              "displayHorizontal": true
+            }
+          },
+          "title": "Top Referer",
+          "id": ""
+        }
+      },
+      {
+        "yPos": 42,
+        "width": 47,
+        "height": 10,
+        "widget": {
+          "xyChart": {
+            "dataSets": [
+              {
+                "timeSeriesQuery": {
+                  "opsAnalyticsQuery": {
+                    "savedQueryId": "",
+                    "sql": "SELECT\n  count(timestamp) as Requests, \n\n  http_request.request_url, \n\nFROM\n  `lab-kk.global._Default._AllLogs`\nWHERE\n  resource.type = 'http_load_balancer' \n  and\n  IF(\n    ARRAY_LENGTH(@Security_Policy) = 0,\n    TRUE,\n   json_value(json_payload.enforcedSecurityPolicy.name) IN UNNEST(@Security_Policy)\n  )\n  and \n\n  IF(\n    ARRAY_LENGTH(@Backend_name) = 0,\n    TRUE,\n    json_value(resource.labels.backend_service_name) IN UNNEST(@Backend_name)\n  )\nand\n  IF(\n    ARRAY_LENGTH(@Region_Code) = 0,\n    TRUE,\n    JSON_VALUE(json_payload.securityPolicyRequestData.remoteIpInfo.regionCode) IN UNNEST(@Region_Code)\n  )\n\nGROUP BY\n  2,\n  timestamp\nORDER BY\n  timestamp DESC\n  --LIMIT 100",
+                    "queryHandle": ""
+                  },
+                  "unitOverride": "",
+                  "outputFullDuration": false
+                },
+                "plotType": "STACKED_BAR",
+                "legendTemplate": "",
+                "targetAxis": "Y1",
+                "dimensions": [
+                  {
+                    "column": "request_url",
+                    "columnType": "STRING",
+                    "maxBinCount": 5,
+                    "sortOrder": "SORT_ORDER_ASCENDING",
+                    "sortColumn": "request_url"
+                  }
+                ],
+                "measures": [
+                  {
+                    "column": "Requests",
+                    "aggregationFunction": {
+                      "type": "count",
+                      "parameters": []
+                    }
+                  }
+                ],
+                "breakdowns": []
+              }
+            ],
+            "thresholds": [],
+            "yAxis": {
+              "label": "",
+              "scale": "LINEAR"
+            },
+            "chartOptions": {
+              "mode": "COLOR",
+              "showLegend": false,
+              "displayHorizontal": true
+            }
+          },
+          "title": "Top URLs",
+          "id": ""
+        }
+      },
+      {
+        "xPos": 33,
+        "yPos": 52,
+        "width": 14,
+        "height": 10,
+        "widget": {
+          "xyChart": {
+            "dataSets": [
+              {
+                "timeSeriesQuery": {
+                  "opsAnalyticsQuery": {
+                    "savedQueryId": "",
+                    "sql": "SELECT\n  count(timestamp) as requests, \n  http_request.request_method, \n \nFROM\n  `lab-kk.global._Default._AllLogs`\nWHERE\n  resource.type = 'http_load_balancer' \n  and\n  IF(\n    ARRAY_LENGTH(@Security_Policy) = 0,\n    TRUE,\n   json_value(json_payload.enforcedSecurityPolicy.name) IN UNNEST(@Security_Policy)\n  )\n  and \n\n  IF(\n    ARRAY_LENGTH(@Backend_name) = 0,\n    TRUE,\n    json_value(resource.labels.backend_service_name) IN UNNEST(@Backend_name)\n  )\nand\n  IF(\n    ARRAY_LENGTH(@Region_Code) = 0,\n    TRUE,\n    JSON_VALUE(json_payload.securityPolicyRequestData.remoteIpInfo.regionCode) IN UNNEST(@Region_Code)\n  )\n\nGROUP BY\n  2,\n  timestamp\nORDER BY\n  timestamp DESC\n  --LIMIT 100",
+                    "queryHandle": ""
+                  },
+                  "unitOverride": "",
+                  "outputFullDuration": false
+                },
+                "plotType": "STACKED_BAR",
+                "legendTemplate": "",
+                "targetAxis": "Y1",
+                "dimensions": [
+                  {
+                    "column": "request_method",
+                    "columnType": "STRING",
+                    "maxBinCount": 5,
+                    "sortOrder": "SORT_ORDER_ASCENDING",
+                    "sortColumn": "request_method"
+                  }
+                ],
+                "measures": [
+                  {
+                    "column": "requests",
+                    "aggregationFunction": {
+                      "type": "count",
+                      "parameters": []
+                    }
+                  }
+                ],
+                "breakdowns": []
+              }
+            ],
+            "thresholds": [],
+            "yAxis": {
+              "label": "",
+              "scale": "LINEAR"
+            },
+            "chartOptions": {
+              "mode": "COLOR",
+              "showLegend": false,
+              "displayHorizontal": true
+            }
+          },
+          "title": "Method",
+          "id": ""
+        }
+      },
+      {
+        "yPos": 62,
+        "width": 47,
+        "height": 10,
+        "widget": {
+          "xyChart": {
+            "dataSets": [
+              {
+                "timeSeriesQuery": {
+                  "opsAnalyticsQuery": {
+                    "savedQueryId": "",
+                    "sql": "SELECT\n  count(timestamp) as requests, \n\n  http_request.user_agent,\n \nFROM\n  `lab-kk.global._Default._AllLogs`\nWHERE\n  resource.type = 'http_load_balancer' \n  and\n  IF(\n    ARRAY_LENGTH(@Security_Policy) = 0,\n    TRUE,\n   json_value(json_payload.enforcedSecurityPolicy.name) IN UNNEST(@Security_Policy)\n  )\n  and \n\n  IF(\n    ARRAY_LENGTH(@Backend_name) = 0,\n    TRUE,\n    json_value(resource.labels.backend_service_name) IN UNNEST(@Backend_name)\n  )\nand\n  IF(\n    ARRAY_LENGTH(@Region_Code) = 0,\n    TRUE,\n    JSON_VALUE(json_payload.securityPolicyRequestData.remoteIpInfo.regionCode) IN UNNEST(@Region_Code)\n  )\n\nGROUP BY\n  2,\n  timestamp\nORDER BY\n  timestamp DESC\n  --LIMIT 100",
+                    "queryHandle": ""
+                  },
+                  "unitOverride": "",
+                  "outputFullDuration": false
+                },
+                "plotType": "STACKED_BAR",
+                "legendTemplate": "",
+                "targetAxis": "Y1",
+                "dimensions": [
+                  {
+                    "column": "user_agent",
+                    "columnType": "STRING",
+                    "maxBinCount": 5,
+                    "sortOrder": "SORT_ORDER_ASCENDING",
+                    "sortColumn": "user_agent"
+                  }
+                ],
+                "measures": [
+                  {
+                    "column": "requests",
+                    "aggregationFunction": {
+                      "type": "count",
+                      "parameters": []
+                    }
+                  }
+                ],
+                "breakdowns": []
+              }
+            ],
+            "thresholds": [],
+            "yAxis": {
+              "label": "",
+              "scale": "LINEAR"
+            },
+            "chartOptions": {
+              "mode": "COLOR",
+              "showLegend": false,
+              "displayHorizontal": true
+            }
+          },
+          "title": "Top User Agents",
+          "id": ""
+        }
+      },
+      {
+        "yPos": 13,
+        "height": 16,
+        "width": 25,
+        "widget": {
+          "timeSeriesTable": {
+            "dataSets": [
+              {
+                "timeSeriesQuery": {
+                  "timeSeriesFilter": {
+                    "filter": "metric.type=\"loadbalancing.googleapis.com/https/request_count\" resource.type=\"https_lb_rule\" ${Backend_name}",
+                    "aggregation": {
+                      "perSeriesAligner": "ALIGN_SUM",
+                      "crossSeriesReducer": "REDUCE_SUM",
+                      "groupByFields": [
+                        "metric.label.\"client_country\""
+                      ]
+                    },
+                    "pickTimeSeriesFilter": {
+                      "rankingMethod": "METHOD_MEAN",
+                      "numTimeSeries": 100,
+                      "direction": "TOP"
+                    }
+                  },
+                  "outputFullDuration": false
+                },
+                "minAlignmentPeriod": "3600s"
+              }
+            ],
+            "metricVisualization": "BAR",
+            "columnSettings": []
+          },
+          "title": "Requests by Country (1h mean)",
+          "id": ""
+        }
+      },
+      {
+        "yPos": 29,
+        "width": 25,
+        "height": 13,
+        "widget": {
+          "xyChart": {
+            "dataSets": [
+              {
+                "timeSeriesQuery": {
+                  "opsAnalyticsQuery": {
+                    "savedQueryId": "",
+                    "sql": "SELECT\n  COUNT(timestamp) AS Requests,\n\n  http_request.remote_ip,\n\nFROM\n  `lab-kk.global._Default._AllLogs`\nWHERE\n  resource.type = 'http_load_balancer' \n  and\n  IF(\n    ARRAY_LENGTH(@Security_Policy) = 0,\n    TRUE,\n   json_value(json_payload.enforcedSecurityPolicy.name) IN UNNEST(@Security_Policy)\n  )\n  and \n\n  IF(\n    ARRAY_LENGTH(@Backend_name) = 0,\n    TRUE,\n    json_value(resource.labels.backend_service_name) IN UNNEST(@Backend_name)\n  )\nand\n  IF(\n    ARRAY_LENGTH(@Region_Code) = 0,\n    TRUE,\n    JSON_VALUE(json_payload.securityPolicyRequestData.remoteIpInfo.regionCode) IN UNNEST(@Region_Code)\n  )\n\nGROUP BY\n  2,\n  timestamp\nORDER BY\n  timestamp DESC\n  --LIMIT 100",
+                    "queryHandle": ""
+                  },
+                  "unitOverride": "",
+                  "outputFullDuration": false
+                },
+                "plotType": "STACKED_BAR",
+                "legendTemplate": "",
+                "targetAxis": "Y1",
+                "dimensions": [
+                  {
+                    "column": "remote_ip",
+                    "columnType": "STRING",
+                    "maxBinCount": 5,
+                    "sortOrder": "SORT_ORDER_ASCENDING",
+                    "sortColumn": "remote_ip"
+                  }
+                ],
+                "measures": [
+                  {
+                    "column": "Requests",
+                    "aggregationFunction": {
+                      "type": "count",
+                      "parameters": []
+                    }
+                  }
+                ],
+                "breakdowns": []
+              }
+            ],
+            "thresholds": [],
+            "yAxis": {
+              "label": "",
+              "scale": "LINEAR"
+            },
+            "chartOptions": {
+              "mode": "COLOR",
+              "showLegend": false,
+              "displayHorizontal": true
+            }
+          },
+          "title": "Top Client IPs",
+          "id": ""
+        }
+      },
+      {
+        "xPos": 25,
+        "yPos": 13,
+        "height": 16,
+        "width": 23,
+        "widget": {
+          "xyChart": {
+            "dataSets": [
+              {
+                "timeSeriesQuery": {
+                  "timeSeriesFilter": {
+                    "filter": "metric.type=\"loadbalancing.googleapis.com/https/response_bytes_count\" resource.type=\"https_lb_rule\" ${Backend_name}",
+                    "aggregation": {
+                      "perSeriesAligner": "ALIGN_SUM",
+                      "crossSeriesReducer": "REDUCE_SUM",
+                      "groupByFields": [
+                        "metric.label.\"client_country\""
+                      ]
+                    }
+                  }
+                },
+                "plotType": "STACKED_AREA",
+                "targetAxis": "Y1",
+                "minAlignmentPeriod": "3600s"
+              }
+            ],
+            "chartOptions": {
+              "mode": "COLOR",
+              "displayHorizontal": false
+            },
+            "thresholds": [],
+            "yAxis": {
+              "scale": "LINEAR"
+            }
+          },
+          "title": "Traffic by Country by Hour",
+          "id": ""
+        }
+      },
+      {
+        "xPos": 25,
+        "yPos": 29,
+        "height": 13,
+        "width": 22,
+        "widget": {
+          "xyChart": {
+            "dataSets": [
+              {
+                "timeSeriesQuery": {
+                  "timeSeriesFilter": {
+                    "filter": "metric.type=\"loadbalancing.googleapis.com/https/request_count\" resource.type=\"https_lb_rule\" ${Backend_name}",
+                    "aggregation": {
+                      "perSeriesAligner": "ALIGN_RATE",
+                      "crossSeriesReducer": "REDUCE_SUM",
+                      "groupByFields": [
+                        "metric.label.\"response_code_class\""
+                      ]
+                    }
+                  }
+                },
+                "plotType": "STACKED_AREA",
+                "targetAxis": "Y1",
+                "minAlignmentPeriod": "60s"
+              }
+            ],
+            "chartOptions": {
+              "mode": "COLOR",
+              "displayHorizontal": false
+            },
+            "thresholds": [],
+            "yAxis": {
+              "scale": "LINEAR"
+            }
+          },
+          "title": "Status Codes",
+          "id": ""
+        }
+      },
+      {
+        "yPos": 100,
+        "width": 48,
+        "height": 19,
+        "widget": {
+          "xyChart": {
+            "dataSets": [
+              {
+                "timeSeriesQuery": {
+                  "opsAnalyticsQuery": {
+                    "savedQueryId": "",
+                    "sql": "SELECT\n  count(timestamp) as Requests, \n  json_value(json_payload.enforcedSecurityPolicy.name) as Security_Policy,\n  json_value(json_payload.enforcedSecurityPolicy.priority) as Rule_Priority,\n  json_value(json_payload.enforcedSecurityPolicy.configuredAction) as Rule_Action,\n  --json_payload.previewSecurityPolicy\n  \n\nFROM\n  `lab-kk.global._Default._AllLogs`\nWHERE\n  resource.type = 'http_load_balancer' \n  and\n  IF(\n    ARRAY_LENGTH(@Security_Policy) = 0,\n    TRUE,\n   json_value(json_payload.enforcedSecurityPolicy.name) IN UNNEST(@Security_Policy)\n  )\n  and \n\n  IF(\n    ARRAY_LENGTH(@Backend_name) = 0,\n    TRUE,\n    json_value(resource.labels.backend_service_name) IN UNNEST(@Backend_name)\n  )\nand\n  IF(\n    ARRAY_LENGTH(@Region_Code) = 0,\n    TRUE,\n    JSON_VALUE(json_payload.securityPolicyRequestData.remoteIpInfo.regionCode) IN UNNEST(@Region_Code)\n  )\n\nGROUP BY\n  2,3,4, timestamp\nORDER BY\n  timestamp DESC\n  --LIMIT 100",
+                    "queryHandle": ""
+                  },
+                  "unitOverride": "",
+                  "outputFullDuration": false
+                },
+                "plotType": "STACKED_BAR",
+                "legendTemplate": "",
+                "targetAxis": "Y1",
+                "dimensions": [
+                  {
+                    "column": "Rule_Priority",
+                    "columnType": "STRING",
+                    "maxBinCount": 10,
+                    "sortOrder": "SORT_ORDER_ASCENDING",
+                    "sortColumn": "Rule_Priority"
+                  }
+                ],
+                "measures": [
+                  {
+                    "column": "Requests",
+                    "aggregationFunction": {
+                      "type": "count",
+                      "parameters": []
+                    }
+                  }
+                ],
+                "breakdowns": [
+                  {
+                    "column": "Security_Policy",
+                    "limit": 10,
+                    "aggregationFunction": {
+                      "type": "count",
+                      "parameters": []
+                    },
+                    "sortOrder": "SORT_ORDER_DESCENDING"
+                  }
+                ]
+              }
+            ],
+            "thresholds": [],
+            "yAxis": {
+              "label": "",
+              "scale": "LINEAR"
+            },
+            "chartOptions": {
+              "mode": "COLOR",
+              "showLegend": false,
+              "displayHorizontal": true
+            }
+          },
+          "title": "Top Rules Hits (by rule priority)",
+          "id": ""
+        }
+      },
+      {
+        "xPos": 24,
+        "yPos": 72,
+        "height": 15,
+        "width": 24,
+        "widget": {
+          "xyChart": {
+            "dataSets": [
+              {
+                "timeSeriesQuery": {
+                  "timeSeriesFilter": {
+                    "filter": "metric.type=\"networksecurity.googleapis.com/https/request_count\" resource.type=\"network_security_policy\" metric.label.\"blocked\"=\"true\" ${Security_Policy} ${Backend_name}",
+                    "aggregation": {
+                      "perSeriesAligner": "ALIGN_RATE",
+                      "crossSeriesReducer": "REDUCE_SUM",
+                      "groupByFields": [
+                        "resource.label.\"policy_name\""
+                      ]
+                    }
+                  }
+                },
+                "plotType": "LINE",
+                "targetAxis": "Y1",
+                "minAlignmentPeriod": "60s",
+                "legendTemplate": "DENY - ${resource.labels.policy_name}"
+              },
+              {
+                "timeSeriesQuery": {
+                  "timeSeriesFilter": {
+                    "filter": "metric.type=\"networksecurity.googleapis.com/https/previewed_request_count\" resource.type=\"network_security_policy\" metric.label.\"blocked\"=\"true\" ${Security_Policy} ${Backend_name}",
+                    "aggregation": {
+                      "perSeriesAligner": "ALIGN_RATE",
+                      "crossSeriesReducer": "REDUCE_SUM",
+                      "groupByFields": [
+                        "resource.label.\"policy_name\""
+                      ]
+                    }
+                  }
+                },
+                "plotType": "LINE",
+                "targetAxis": "Y1",
+                "minAlignmentPeriod": "60s",
+                "legendTemplate": "PREVIEW DENY - ${resource.labels.policy_name}"
+              }
+            ],
+            "chartOptions": {
+              "mode": "COLOR",
+              "displayHorizontal": false
+            },
+            "thresholds": [],
+            "yAxis": {
+              "scale": "LINEAR"
+            },
+            "timeshiftDuration": "604800s"
+          },
+          "title": "Blocked Requests per Policy",
+          "id": ""
+        }
+      },
+      {
+        "yPos": 72,
+        "height": 15,
+        "width": 23,
+        "widget": {
+          "xyChart": {
+            "dataSets": [
+              {
+                "timeSeriesQuery": {
+                  "timeSeriesFilter": {
+                    "filter": "metric.type=\"networksecurity.googleapis.com/https/request_count\" resource.type=\"network_security_policy\" metric.label.\"blocked\"=\"false\" ${Security_Policy} ${Backend_name}",
+                    "aggregation": {
+                      "perSeriesAligner": "ALIGN_RATE",
+                      "crossSeriesReducer": "REDUCE_SUM",
+                      "groupByFields": [
+                        "resource.label.\"policy_name\""
+                      ]
+                    }
+                  }
+                },
+                "plotType": "LINE",
+                "targetAxis": "Y1",
+                "minAlignmentPeriod": "60s",
+                "legendTemplate": "ALLOW - ${resource.labels.policy_name}"
+              },
+              {
+                "timeSeriesQuery": {
+                  "timeSeriesFilter": {
+                    "filter": "metric.type=\"networksecurity.googleapis.com/https/previewed_request_count\" resource.type=\"network_security_policy\" metric.label.\"blocked\"=\"false\" ${Security_Policy} ${Backend_name}",
+                    "aggregation": {
+                      "perSeriesAligner": "ALIGN_RATE",
+                      "crossSeriesReducer": "REDUCE_SUM",
+                      "groupByFields": [
+                        "resource.label.\"policy_name\""
+                      ]
+                    }
+                  }
+                },
+                "plotType": "LINE",
+                "targetAxis": "Y1",
+                "minAlignmentPeriod": "60s",
+                "legendTemplate": "PREVIEW ALLOW - ${resource.labels.policy_name}"
+              }
+            ],
+            "chartOptions": {
+              "mode": "COLOR",
+              "displayHorizontal": false
+            },
+            "thresholds": [],
+            "yAxis": {
+              "scale": "LINEAR"
+            },
+            "timeshiftDuration": "604800s"
+          },
+          "title": "Allowed Requests per Policy",
+          "id": ""
+        }
+      },
+      {
+        "xPos": 1,
+        "width": 12,
+        "height": 13,
+        "widget": {
+          "xyChart": {
+            "dataSets": [
+              {
+                "timeSeriesQuery": {
+                  "opsAnalyticsQuery": {
+                    "savedQueryId": "",
+                    "sql": "SELECT\n  count(timestamp) as Requests , \n -- timestamp,\n  json_value(json_payload.enforcedSecurityPolicy.configuredAction) as Rule_Action,\n    json_value(json_payload.enforcedSecurityPolicy.name) as Security_Policy,\n  --json_payload.previewSecurityPolicy\n  \nFROM\n  `lab-kk.global._Default._AllLogs`\n  where resource.type = 'http_load_balancer' --and severity = 'WARNING'\n  and  json_value(json_payload.enforcedSecurityPolicy.configuredAction) is not NULL\nand\n  IF(\n    ARRAY_LENGTH(@Security_Policy) = 0,\n    TRUE,\n   json_value(json_payload.enforcedSecurityPolicy.name) IN UNNEST(@Security_Policy)\n  )\n  and \n\n  IF(\n    ARRAY_LENGTH(@Backend_name) = 0,\n    TRUE,\n    json_value(resource.labels.backend_service_name) IN UNNEST(@Backend_name)\n  )\n  and\n  IF(\n    ARRAY_LENGTH(@Region_Code) = 0,\n    TRUE,\n    JSON_VALUE(json_payload.securityPolicyRequestData.remoteIpInfo.regionCode) IN UNNEST(@Region_Code)\n  )\n\n\n  group by 2 ,3\norder by Rule_Action desc\n--LIMIT 100",
+                    "queryHandle": ""
+                  },
+                  "unitOverride": "",
+                  "outputFullDuration": false
+                },
+                "plotType": "STACKED_BAR",
+                "legendTemplate": "",
+                "targetAxis": "Y1",
+                "dimensions": [
+                  {
+                    "column": "Rule_Action",
+                    "columnType": "STRING",
+                    "maxBinCount": 5,
+                    "sortOrder": "SORT_ORDER_ASCENDING",
+                    "sortColumn": "Rule_Action"
+                  }
+                ],
+                "measures": [
+                  {
+                    "column": "Requests",
+                    "aggregationFunction": {
+                      "type": "average",
+                      "parameters": []
+                    }
+                  }
+                ],
+                "breakdowns": []
+              }
+            ],
+            "thresholds": [],
+            "yAxis": {
+              "label": "",
+              "scale": "LINEAR"
+            },
+            "chartOptions": {
+              "mode": "COLOR",
+              "showLegend": false,
+              "displayHorizontal": true
+            }
+          },
+          "title": "Requests - High Level",
+          "id": ""
+        }
+      },
+      {
+        "xPos": 13,
+        "width": 34,
+        "height": 13,
+        "widget": {
+          "xyChart": {
+            "dataSets": [
+              {
+                "timeSeriesQuery": {
+                  "opsAnalyticsQuery": {
+                    "savedQueryId": "",
+                    "sql": "\n  SELECT\n  (timestamp), \n count(timestamp) as requests,\n  json_value(json_payload.enforcedSecurityPolicy.configuredAction) as Rule_Action,\n    json_value(json_payload.enforcedSecurityPolicy.name) as Security_Policy\n  \nFROM\n  `lab-kk.global._Default._AllLogs`\n  where resource.type = 'http_load_balancer' --and severity = 'WARNING'\n  and  json_value(json_payload.enforcedSecurityPolicy.configuredAction) is not null\n  and\n  IF(\n    ARRAY_LENGTH(@Security_Policy) = 0,\n    TRUE,\n   json_value(json_payload.enforcedSecurityPolicy.name) IN UNNEST(@Security_Policy)\n  )\n  and \n\n  IF(\n    ARRAY_LENGTH(@Backend_name) = 0,\n    TRUE,\n    json_value(resource.labels.backend_service_name) IN UNNEST(@Backend_name)\n  )\n  and\n  IF(\n    ARRAY_LENGTH(@Region_Code) = 0,\n    TRUE,\n    JSON_VALUE(json_payload.securityPolicyRequestData.remoteIpInfo.regionCode) IN UNNEST(@Region_Code)\n  )\n\n  group by 1,4,3\n",
+                    "queryHandle": ""
+                  },
+                  "unitOverride": "",
+                  "outputFullDuration": false
+                },
+                "plotType": "LINE",
+                "legendTemplate": "",
+                "targetAxis": "Y1",
+                "dimensions": [
+                  {
+                    "column": "timestamp",
+                    "columnType": "TIMESTAMP",
+                    "timeBinSize": "0s",
+                    "maxBinCount": 0,
+                    "sortOrder": "SORT_ORDER_ASCENDING",
+                    "sortColumn": "timestamp"
+                  }
+                ],
+                "measures": [
+                  {
+                    "column": "requests",
+                    "aggregationFunction": {
+                      "type": "count",
+                      "parameters": []
+                    }
+                  }
+                ],
+                "breakdowns": [
+                  {
+                    "column": "Rule_Action",
+                    "limit": 5,
+                    "aggregationFunction": {
+                      "type": "count",
+                      "parameters": []
+                    },
+                    "sortOrder": "SORT_ORDER_DESCENDING"
+                  }
+                ]
+              }
+            ],
+            "thresholds": [],
+            "yAxis": {
+              "label": "",
+              "scale": "LINEAR"
+            },
+            "chartOptions": {
+              "mode": "COLOR",
+              "showLegend": false,
+              "displayHorizontal": false
+            }
+          },
+          "title": "Requests - High Level",
+          "id": ""
+        }
+      },
+      {
+        "width": 48,
+        "height": 13,
+        "widget": {
+          "title": "1. Cloud Armor - At a Glance",
+          "collapsibleGroup": {
+            "collapsed": false
+          },
+          "id": ""
+        }
+      },
+      {
+        "yPos": 87,
+        "width": 27,
+        "height": 13,
+        "widget": {
+          "xyChart": {
+            "dataSets": [
+              {
+                "timeSeriesQuery": {
+                  "opsAnalyticsQuery": {
+                    "savedQueryId": "",
+                    "sql": "SELECT\n  count(timestamp) as Requests, \n  timestamp,\n  json_value(json_payload.enforcedSecurityPolicy.name) as Security_Policy,\n  json_value(json_payload.enforcedSecurityPolicy.priority) as Rule_Priority,\n  json_value(json_payload.enforcedSecurityPolicy.preconfiguredExprIds.0) as preconfiguredExprIds,\n\n  \nFROM\n  `lab-kk.global._Default._AllLogs`\n  where resource.type = 'http_load_balancer'\n  and json_value(json_payload.enforcedSecurityPolicy.preconfiguredExprIds.0) is not null\n  and\n  IF(\n    ARRAY_LENGTH(@Security_Policy) = 0,\n    TRUE,\n   json_value(json_payload.enforcedSecurityPolicy.name) IN UNNEST(@Security_Policy)\n  )\n  and \n\n  IF(\n    ARRAY_LENGTH(@Backend_name) = 0,\n    TRUE,\n    json_value(resource.labels.backend_service_name) IN UNNEST(@Backend_name)\n  )\n  and\n  \n\n  IF(\n    ARRAY_LENGTH(@Region_Code) = 0,\n    TRUE,\n    json_value(json_payload.securityPolicyRequestData.remoteIpInfo.regionCode) IN UNNEST(@Region_Code)\n  )\ngroup by 5,3,4, timestamp\norder by timestamp desc\n--LIMIT 100",
+                    "queryHandle": ""
+                  },
+                  "unitOverride": "",
+                  "outputFullDuration": false
+                },
+                "plotType": "LINE",
+                "legendTemplate": "",
+                "targetAxis": "Y1",
+                "dimensions": [
+                  {
+                    "column": "timestamp",
+                    "columnType": "TIMESTAMP",
+                    "timeBinSize": "0s",
+                    "maxBinCount": 0,
+                    "sortOrder": "SORT_ORDER_ASCENDING",
+                    "sortColumn": "timestamp"
+                  }
+                ],
+                "measures": [
+                  {
+                    "column": "Requests",
+                    "aggregationFunction": {
+                      "type": "count",
+                      "parameters": []
+                    }
+                  }
+                ],
+                "breakdowns": [
+                  {
+                    "column": "preconfiguredExprIds",
+                    "limit": 5,
+                    "aggregationFunction": {
+                      "type": "count",
+                      "parameters": []
+                    },
+                    "sortOrder": "SORT_ORDER_DESCENDING"
+                  }
+                ]
+              }
+            ],
+            "thresholds": [],
+            "yAxis": {
+              "label": "",
+              "scale": "LINEAR"
+            },
+            "chartOptions": {
+              "mode": "COLOR",
+              "showLegend": false,
+              "displayHorizontal": false
+            }
+          },
+          "title": "WAF Pre-configured Rule Hits ",
+          "id": ""
+        }
+      },
+      {
+        "xPos": 27,
+        "yPos": 87,
+        "width": 20,
+        "height": 13,
+        "widget": {
+          "xyChart": {
+            "dataSets": [
+              {
+                "timeSeriesQuery": {
+                  "opsAnalyticsQuery": {
+                    "savedQueryId": "",
+                    "sql": "SELECT\n  count(timestamp) as Requests, \n\n  json_value(json_payload.enforcedSecurityPolicy.name) as Security_Policy,\n  json_value(json_payload.enforcedSecurityPolicy.priority) as Rule_Priority,\n  json_value(json_payload.enforcedSecurityPolicy.preconfiguredExprIds.0) as preconfiguredExprIds,\n\n  \nFROM\n  `lab-kk.global._Default._AllLogs`\n  where resource.type = 'http_load_balancer'\n  and json_value(json_payload.enforcedSecurityPolicy.preconfiguredExprIds.0) is not null\n  and\n  IF(\n    ARRAY_LENGTH(@Security_Policy) = 0,\n    TRUE,\n   json_value(json_payload.enforcedSecurityPolicy.name) IN UNNEST(@Security_Policy)\n  )\n  and \n\n  IF(\n    ARRAY_LENGTH(@Backend_name) = 0,\n    TRUE,\n    json_value(resource.labels.backend_service_name) IN UNNEST(@Backend_name)\n  )\n  and\n  \n\n  IF(\n    ARRAY_LENGTH(@Region_Code) = 0,\n    TRUE,\n    json_value(json_payload.securityPolicyRequestData.remoteIpInfo.regionCode) IN UNNEST(@Region_Code)\n  )\ngroup by 2,3,4, timestamp\norder by timestamp desc\n--LIMIT 100",
+                    "queryHandle": ""
+                  },
+                  "unitOverride": "",
+                  "outputFullDuration": false
+                },
+                "plotType": "STACKED_BAR",
+                "legendTemplate": "",
+                "targetAxis": "Y1",
+                "dimensions": [
+                  {
+                    "column": "preconfiguredExprIds",
+                    "columnType": "STRING",
+                    "maxBinCount": 5,
+                    "sortOrder": "SORT_ORDER_ASCENDING",
+                    "sortColumn": "preconfiguredExprIds"
+                  }
+                ],
+                "measures": [
+                  {
+                    "column": "Requests",
+                    "aggregationFunction": {
+                      "type": "count",
+                      "parameters": []
+                    }
+                  }
+                ],
+                "breakdowns": [
+                  {
+                    "column": "Security_Policy",
+                    "limit": 5,
+                    "aggregationFunction": {
+                      "type": "count",
+                      "parameters": []
+                    },
+                    "sortOrder": "SORT_ORDER_DESCENDING"
+                  }
+                ]
+              }
+            ],
+            "thresholds": [],
+            "yAxis": {
+              "label": "",
+              "scale": "LINEAR"
+            },
+            "chartOptions": {
+              "mode": "COLOR",
+              "showLegend": false,
+              "displayHorizontal": true
+            }
+          },
+          "title": "WAF Pre-configured Rule Hits ",
+          "id": ""
+        }
+      },
+      {
+        "yPos": 13,
+        "width": 48,
+        "height": 59,
+        "widget": {
+          "title": "2. Ingress Patterns",
+          "collapsibleGroup": {
+            "collapsed": false
+          },
+          "id": ""
+        }
+      },
+      {
+        "yPos": 72,
+        "width": 48,
+        "height": 74,
+        "widget": {
+          "title": "3. Cloud Armor Policies",
+          "collapsibleGroup": {
+            "collapsed": false
+          },
+          "id": ""
+        }
+      }
+    ]
+  },
+  "dashboardFilters": [
+    {
+      "filterType": "RESOURCE_LABEL",
+      "labelKey": "policy_name",
+      "templateVariable": "Security_Policy",
+      "valueType": "STRING_ARRAY"
+    },
+    {
+      "filterType": "RESOURCE_LABEL",
+      "labelKey": "backend_target_name",
+      "templateVariable": "Backend_name",
+      "valueType": "STRING_ARRAY"
+    },
+    {
+      "filterType": "VALUE_ONLY",
+      "stringArray": {
+        "values": [
+          "AD",
+          "AE",
+          "AF",
+          "AG",
+          "AI",
+          "AL",
+          "AM",
+          "AO",
+          "AQ",
+          "AR",
+          "AS",
+          "AT",
+          "AU",
+          "AW",
+          "AX",
+          "AZ",
+          "BA",
+          "BB",
+          "BD",
+          "BE",
+          "BF",
+          "BG",
+          "BH",
+          "BI",
+          "BJ",
+          "BL",
+          "BM",
+          "BN",
+          "BO",
+          "BQ",
+          "BR",
+          "BS",
+          "BT",
+          "BV",
+          "BW",
+          "BY",
+          "BZ",
+          "CA",
+          "CC",
+          "CD",
+          "CF",
+          "CG",
+          "CH",
+          "CI",
+          "CK",
+          "CL",
+          "CM",
+          "CN",
+          "CO",
+          "CR",
+          "CU",
+          "CV",
+          "CW",
+          "CX",
+          "CY",
+          "CZ",
+          "DE",
+          "DJ",
+          "DK",
+          "DM",
+          "DO",
+          "DZ",
+          "EC",
+          "EE",
+          "EG",
+          "EH",
+          "ER",
+          "ES",
+          "ET",
+          "FI",
+          "FJ",
+          "FK",
+          "FM",
+          "FO",
+          "FR",
+          "GA",
+          "GB",
+          "GD",
+          "GE",
+          "GF",
+          "GG",
+          "GH",
+          "GI",
+          "GL",
+          "GM",
+          "GN",
+          "GP",
+          "GQ",
+          "GR",
+          "GS",
+          "GT",
+          "GU",
+          "GW",
+          "GY",
+          "HK",
+          "HM",
+          "HN",
+          "HR",
+          "HT",
+          "HU",
+          "ID",
+          "IE",
+          "IL",
+          "IM",
+          "IN",
+          "IO",
+          "IQ",
+          "IR",
+          "IS",
+          "IT",
+          "JE",
+          "JM",
+          "JO",
+          "JP",
+          "KE",
+          "KG",
+          "KH",
+          "KI",
+          "KM",
+          "KN",
+          "KP",
+          "KR",
+          "KW",
+          "KY",
+          "KZ",
+          "LA",
+          "LB",
+          "LC",
+          "LI",
+          "LK",
+          "LR",
+          "LS",
+          "LT",
+          "LU",
+          "LV",
+          "LY",
+          "MA",
+          "MC",
+          "MD",
+          "ME",
+          "MF",
+          "MG",
+          "MH",
+          "MK",
+          "ML",
+          "MM",
+          "MN",
+          "MO",
+          "MP",
+          "MQ",
+          "MR",
+          "MS",
+          "MT",
+          "MU",
+          "MV",
+          "MW",
+          "MX",
+          "MY",
+          "MZ",
+          "NA",
+          "NC",
+          "NE",
+          "NF",
+          "NG",
+          "NI",
+          "NL",
+          "NO",
+          "NP",
+          "NR",
+          "NU",
+          "NZ",
+          "OM",
+          "PA",
+          "PE",
+          "PF",
+          "PG",
+          "PH",
+          "PK",
+          "PL",
+          "PM",
+          "PN",
+          "PR",
+          "PS",
+          "PT",
+          "PW",
+          "PY",
+          "QA",
+          "RE",
+          "RO",
+          "RS",
+          "RU",
+          "RW",
+          "SA",
+          "SB",
+          "SC",
+          "SD",
+          "SE",
+          "SG",
+          "SH",
+          "SI",
+          "SJ",
+          "SK",
+          "SL",
+          "SM",
+          "SN",
+          "SO",
+          "SR",
+          "SS",
+          "ST",
+          "SV",
+          "SX",
+          "SY",
+          "SZ",
+          "TC",
+          "TD",
+          "TF",
+          "TG",
+          "TH",
+          "TJ",
+          "TK",
+          "TL",
+          "TM",
+          "TN",
+          "TO",
+          "TR",
+          "TT",
+          "TV",
+          "TW",
+          "TZ",
+          "UA",
+          "UG",
+          "UM",
+          "US",
+          "UY",
+          "UZ",
+          "VA",
+          "VC",
+          "VE",
+          "VG",
+          "VI",
+          "VN",
+          "VU",
+          "WF",
+          "WS",
+          "YE",
+          "YT",
+          "ZA",
+          "ZM",
+          "ZW"
+        ]
+      },
+      "templateVariable": "Region_Code",
+      "valueType": "STRING_ARRAY"
+    }
+  ],
+  "labels": {}
+}
