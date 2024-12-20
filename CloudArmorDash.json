@@ -1,3 +1,5 @@
+## replace [projectID] value in json with your project id ##
+
 {
   "displayName": "Cloud Armor WAF Dashboard",
   "mosaicLayout": {
@@ -8,33 +10,37 @@
         "width": 48,
         "height": 27,
         "widget": {
+          "title": "Last 50 requests through Cloud Armor",
           "timeSeriesTable": {
             "dataSets": [
               {
                 "timeSeriesQuery": {
                   "opsAnalyticsQuery": {
-                    "savedQueryId": "",
-                    "sql": "SELECT\n  timestamp, http_request.request_method, http_request.status,\n  http_request.request_url, \n  --http_request.request_size,\n  \n  --http_request.response_size,\n  http_request.user_agent,\n  http_request.remote_ip,\n -- http_request.server_ip,\n  http_request.referer,\n  json_value(json_payload.securityPolicyRequestData.remoteIpInfo.regionCode) as regionCode,\n  json_value(json_payload.securityPolicyRequestData.tlsJa3Fingerprint) as Ja3Fingerprint,\n  json_value(json_payload.enforcedSecurityPolicy.name) as Security_Policy,\n  json_value(json_payload.enforcedSecurityPolicy.priority) as Rule_Priority,\n  json_value(json_payload.enforcedSecurityPolicy.configuredAction) as Rule_Action,\n  json_value(json_payload.enforcedSecurityPolicy.preconfiguredExprIds.0) as preconfiguredExprIds,\n  json_value(json_payload.previewSecurityPolicy.name) as Preview_Security_Policy,\n  json_value(json_payload.previewSecurityPolicy.priority) as Preview_Rule_Priority,\n  json_value(json_payload.previewSecurityPolicy.configuredAction) as Preview_Rule_Action,\n  --json_payload.previewSecurityPolicy\n  \nFROM\n  `lab-kk.global._Default._AllLogs`\n  where resource.type = 'http_load_balancer' --and severity = 'WARNING'\n  and (json_payload.enforcedSecurityPolicy.name is not null OR json_payload.previewSecurityPolicy.name is not null)\n  and\n  IF(\n    ARRAY_LENGTH(@Security_Policy) = 0,\n    TRUE,\n   json_value(json_payload.enforcedSecurityPolicy.name) IN UNNEST(@Security_Policy)\n  )\n  and \n\n  IF(\n    ARRAY_LENGTH(@Backend_name) = 0,\n    TRUE,\n    json_value(resource.labels.backend_service_name) IN UNNEST(@Backend_name)\n  )\n  and\n  IF(\n    ARRAY_LENGTH(@Region_Code) = 0,\n    TRUE,\n    json_value(json_payload.securityPolicyRequestData.remoteIpInfo.regionCode) IN UNNEST(@Region_Code)\n  )\norder by timestamp desc\nLIMIT 50",
-                    "queryHandle": ""
-                  },
-                  "unitOverride": "",
-                  "outputFullDuration": false
-                },
-                "tableTemplate": "",
-                "minAlignmentPeriod": "0s"
+                    "queryBuilder": {
+                      "fields": [],
+                      "filter": {
+                        "expressions": [],
+                        "operatorType": "AND"
+                      },
+                      "limit": "0",
+                      "orderBys": [],
+                      "resourceNames": [],
+                      "searchTerm": ""
+                    },
+                    "queryHandle": "CgipFw831NHn-BIgam9iXzZFN2pxejJaMlRHbTJLODFtc05IcjVPZm45QkEaAlVTQLqYlpiMCQ",
+                    "sql": "SELECT\n  timestamp,\n  http_request.request_method,\n  http_request.status,\n  http_request.request_url,\n  --http_request.request_size,\n  --http_request.response_size,\n  http_request.user_agent,\n  http_request.remote_ip,\n  -- http_request.server_ip,\n  http_request.referer,\n  JSON_VALUE(json_payload.securityPolicyRequestData.remoteIpInfo.regionCode) AS regionCode,\n  JSON_VALUE(json_payload.securityPolicyRequestData.remoteIpInfo.asn) AS asn,\n  JSON_VALUE(json_payload.securityPolicyRequestData.tlsJa3Fingerprint) AS Ja3Fingerprint,\n  JSON_VALUE(json_payload.enforcedSecurityPolicy.matchedFieldLength) AS fieldLength,\n  JSON_VALUE(json_payload.enforcedSecurityPolicy.matchedFieldType) AS fieldType,\n  JSON_VALUE(json_payload.enforcedSecurityPolicy.matchedFieldValue) AS fieldValue,\n  JSON_VALUE(json_payload.enforcedSecurityPolicy.name) AS Security_Policy,\n  JSON_VALUE(json_payload.enforcedSecurityPolicy.priority) AS Rule_Priority,\n  JSON_VALUE(json_payload.enforcedSecurityPolicy.configuredAction) AS Rule_Action,\n  JSON_VALUE(json_payload.enforcedSecurityPolicy.preconfiguredExprIds.0) AS preconfiguredExprIds,\n  JSON_VALUE(json_payload.previewSecurityPolicy.name) AS Preview_Security_Policy,\n  JSON_VALUE(json_payload.previewSecurityPolicy.priority) AS Preview_Rule_Priority,\n  JSON_VALUE(json_payload.previewSecurityPolicy.configuredAction) AS Preview_Rule_Action,\n  --json_payload.previewSecurityPolicy\nFROM\n  `[projectID].global._Default._AllLogs`\nWHERE\n  resource.type = 'http_load_balancer' --and severity = 'WARNING'\n  AND (json_payload.enforcedSecurityPolicy.name IS NOT NULL\n    OR json_payload.previewSecurityPolicy.name IS NOT NULL)\n  AND\nIF\n  ( ARRAY_LENGTH(@Security_Policy) = 0, TRUE, JSON_VALUE(json_payload.enforcedSecurityPolicy.name) IN UNNEST(@Security_Policy) )\n  AND\nIF\n  ( ARRAY_LENGTH(@Backend_name) = 0, TRUE, JSON_VALUE(resource.labels.backend_service_name) IN UNNEST(@Backend_name) )\n  AND\nIF\n  ( ARRAY_LENGTH(@Region_Code) = 0, TRUE, JSON_VALUE(json_payload.securityPolicyRequestData.remoteIpInfo.regionCode) IN UNNEST(@Region_Code) )\nORDER BY\n  timestamp DESC\nLIMIT\n  50"
+                  }
+                }
               }
             ],
+            "displayColumnType": false,
             "metricVisualization": "NUMBER",
-            "columnSettings": [],
             "opsAnalyticsSettings": {
               "maxRows": "0",
-              "showFilterBar": false,
-              "pageSize": "0"
-            },
-            "displayColumnType": false
-          },
-          "title": "Last 50 requests through Cloud Armor",
-          "id": ""
+              "pageSize": "0",
+              "showFilterBar": false
+            }
+          }
         }
       },
       {
@@ -264,8 +270,8 @@
       },
       {
         "yPos": 13,
-        "height": 16,
         "width": 25,
+        "height": 16,
         "widget": {
           "timeSeriesTable": {
             "dataSets": [
@@ -274,6 +280,7 @@
                   "timeSeriesFilter": {
                     "filter": "metric.type=\"loadbalancing.googleapis.com/https/request_count\" resource.type=\"https_lb_rule\" ${Backend_name}",
                     "aggregation": {
+                      "alignmentPeriod": "3600s",
                       "perSeriesAligner": "ALIGN_SUM",
                       "crossSeriesReducer": "REDUCE_SUM",
                       "groupByFields": [
@@ -286,13 +293,20 @@
                       "direction": "TOP"
                     }
                   },
+                  "unitOverride": "",
                   "outputFullDuration": false
                 },
+                "tableTemplate": "",
                 "minAlignmentPeriod": "3600s"
               }
             ],
             "metricVisualization": "BAR",
-            "columnSettings": []
+            "opsAnalyticsSettings": {
+              "maxRows": "0",
+              "showFilterBar": false,
+              "pageSize": "0"
+            },
+            "displayColumnType": false
           },
           "title": "Requests by Country (1h mean)",
           "id": ""
@@ -357,8 +371,8 @@
       {
         "xPos": 25,
         "yPos": 13,
-        "height": 16,
         "width": 23,
+        "height": 16,
         "widget": {
           "xyChart": {
             "dataSets": [
@@ -367,26 +381,35 @@
                   "timeSeriesFilter": {
                     "filter": "metric.type=\"loadbalancing.googleapis.com/https/response_bytes_count\" resource.type=\"https_lb_rule\" ${Backend_name}",
                     "aggregation": {
+                      "alignmentPeriod": "3600s",
                       "perSeriesAligner": "ALIGN_SUM",
                       "crossSeriesReducer": "REDUCE_SUM",
                       "groupByFields": [
                         "metric.label.\"client_country\""
                       ]
                     }
-                  }
+                  },
+                  "unitOverride": "",
+                  "outputFullDuration": false
                 },
                 "plotType": "STACKED_AREA",
+                "legendTemplate": "",
+                "minAlignmentPeriod": "3600s",
                 "targetAxis": "Y1",
-                "minAlignmentPeriod": "3600s"
+                "dimensions": [],
+                "measures": [],
+                "breakdowns": []
               }
             ],
-            "chartOptions": {
-              "mode": "COLOR",
-              "displayHorizontal": false
-            },
             "thresholds": [],
             "yAxis": {
+              "label": "",
               "scale": "LINEAR"
+            },
+            "chartOptions": {
+              "mode": "COLOR",
+              "showLegend": false,
+              "displayHorizontal": false
             }
           },
           "title": "Traffic by Country by Hour",
@@ -396,8 +419,8 @@
       {
         "xPos": 25,
         "yPos": 29,
-        "height": 13,
         "width": 22,
+        "height": 13,
         "widget": {
           "xyChart": {
             "dataSets": [
@@ -406,26 +429,35 @@
                   "timeSeriesFilter": {
                     "filter": "metric.type=\"loadbalancing.googleapis.com/https/request_count\" resource.type=\"https_lb_rule\" ${Backend_name}",
                     "aggregation": {
+                      "alignmentPeriod": "60s",
                       "perSeriesAligner": "ALIGN_RATE",
                       "crossSeriesReducer": "REDUCE_SUM",
                       "groupByFields": [
                         "metric.label.\"response_code_class\""
                       ]
                     }
-                  }
+                  },
+                  "unitOverride": "",
+                  "outputFullDuration": false
                 },
                 "plotType": "STACKED_AREA",
+                "legendTemplate": "",
+                "minAlignmentPeriod": "60s",
                 "targetAxis": "Y1",
-                "minAlignmentPeriod": "60s"
+                "dimensions": [],
+                "measures": [],
+                "breakdowns": []
               }
             ],
-            "chartOptions": {
-              "mode": "COLOR",
-              "displayHorizontal": false
-            },
             "thresholds": [],
             "yAxis": {
+              "label": "",
               "scale": "LINEAR"
+            },
+            "chartOptions": {
+              "mode": "COLOR",
+              "showLegend": false,
+              "displayHorizontal": false
             }
           },
           "title": "Status Codes",
@@ -437,50 +469,174 @@
         "width": 48,
         "height": 19,
         "widget": {
+          "title": "Top Rules Hits (by rule priority)",
           "xyChart": {
+            "chartOptions": {
+              "displayHorizontal": true,
+              "mode": "COLOR"
+            },
             "dataSets": [
               {
-                "timeSeriesQuery": {
-                  "opsAnalyticsQuery": {
-                    "savedQueryId": "",
-                    "sql": "SELECT\n  count(timestamp) as Requests, \n  json_value(json_payload.enforcedSecurityPolicy.name) as Security_Policy,\n  json_value(json_payload.enforcedSecurityPolicy.priority) as Rule_Priority,\n  json_value(json_payload.enforcedSecurityPolicy.configuredAction) as Rule_Action,\n  --json_payload.previewSecurityPolicy\n  \n\nFROM\n  `lab-kk.global._Default._AllLogs`\nWHERE\n  resource.type = 'http_load_balancer' \n  and\n  IF(\n    ARRAY_LENGTH(@Security_Policy) = 0,\n    TRUE,\n   json_value(json_payload.enforcedSecurityPolicy.name) IN UNNEST(@Security_Policy)\n  )\n  and \n\n  IF(\n    ARRAY_LENGTH(@Backend_name) = 0,\n    TRUE,\n    json_value(resource.labels.backend_service_name) IN UNNEST(@Backend_name)\n  )\nand\n  IF(\n    ARRAY_LENGTH(@Region_Code) = 0,\n    TRUE,\n    JSON_VALUE(json_payload.securityPolicyRequestData.remoteIpInfo.regionCode) IN UNNEST(@Region_Code)\n  )\n\nGROUP BY\n  2,3,4, timestamp\nORDER BY\n  timestamp DESC\n  --LIMIT 100",
-                    "queryHandle": ""
-                  },
-                  "unitOverride": "",
-                  "outputFullDuration": false
-                },
-                "plotType": "STACKED_BAR",
-                "legendTemplate": "",
-                "targetAxis": "Y1",
+                "breakdowns": [
+                  {
+                    "aggregationFunction": {
+                      "type": "count"
+                    },
+                    "column": "Security_Policy",
+                    "limit": 10,
+                    "sortOrder": "SORT_ORDER_DESCENDING"
+                  }
+                ],
                 "dimensions": [
                   {
                     "column": "Rule_Priority",
                     "columnType": "STRING",
                     "maxBinCount": 10,
-                    "sortOrder": "SORT_ORDER_ASCENDING",
-                    "sortColumn": "Rule_Priority"
+                    "sortColumn": "Rule_Priority",
+                    "sortOrder": "SORT_ORDER_ASCENDING"
                   }
                 ],
                 "measures": [
                   {
-                    "column": "Requests",
                     "aggregationFunction": {
-                      "type": "count",
-                      "parameters": []
-                    }
+                      "parameters": [],
+                      "type": "count"
+                    },
+                    "column": "Requests"
                   }
                 ],
-                "breakdowns": [
-                  {
-                    "column": "Security_Policy",
-                    "limit": 10,
-                    "aggregationFunction": {
-                      "type": "count",
-                      "parameters": []
+                "plotType": "STACKED_BAR",
+                "targetAxis": "Y1",
+                "timeSeriesQuery": {
+                  "opsAnalyticsQuery": {
+                    "queryBuilder": {
+                      "fields": [],
+                      "filter": {
+                        "expressions": [],
+                        "operatorType": "AND"
+                      },
+                      "limit": "0",
+                      "orderBys": [],
+                      "resourceNames": [],
+                      "searchTerm": ""
                     },
-                    "sortOrder": "SORT_ORDER_DESCENDING"
+                    "queryHandle": "",
+                    "sql": "SELECT\n  count(timestamp) as Requests, \n  json_value(json_payload.enforcedSecurityPolicy.name) as Security_Policy,\n  json_value(json_payload.enforcedSecurityPolicy.priority) as Rule_Priority,\n  json_value(json_payload.enforcedSecurityPolicy.configuredAction) as Rule_Action,\n  --json_payload.previewSecurityPolicy\n  \n\nFROM\n  `[projectID].global._Default._AllLogs`\nWHERE\n  resource.type = 'http_load_balancer' \n  and\n  IF(\n    ARRAY_LENGTH(@Security_Policy) = 0,\n    TRUE,\n   json_value(json_payload.enforcedSecurityPolicy.name) IN UNNEST(@Security_Policy)\n  )\n  and \n\n  IF(\n    ARRAY_LENGTH(@Backend_name) = 0,\n    TRUE,\n    json_value(resource.labels.backend_service_name) IN UNNEST(@Backend_name)\n  )\nand\n  IF(\n    ARRAY_LENGTH(@Region_Code) = 0,\n    TRUE,\n    JSON_VALUE(json_payload.securityPolicyRequestData.remoteIpInfo.regionCode) IN UNNEST(@Region_Code)\n  )\n\nGROUP BY\n  2,3,4, timestamp\nORDER BY\n  timestamp DESC\n  --LIMIT 100"
                   }
-                ]
+                }
+              }
+            ],
+            "thresholds": [],
+            "yAxis": {
+              "label": "",
+              "scale": "LINEAR"
+            }
+          }
+        }
+      },
+      {
+        "xPos": 24,
+        "yPos": 72,
+        "width": 24,
+        "height": 15,
+        "widget": {
+          "xyChart": {
+            "dataSets": [
+              {
+                "timeSeriesQuery": {
+                  "timeSeriesFilter": {
+                    "filter": "metric.type=\"networksecurity.googleapis.com/https/request_count\" resource.type=\"network_security_policy\" metric.label.\"blocked\"=\"true\" ${Security_Policy}",
+                    "aggregation": {
+                      "alignmentPeriod": "60s",
+                      "perSeriesAligner": "ALIGN_RATE",
+                      "crossSeriesReducer": "REDUCE_SUM",
+                      "groupByFields": [
+                        "resource.label.\"policy_name\""
+                      ]
+                    }
+                  },
+                  "unitOverride": "",
+                  "outputFullDuration": false
+                },
+                "plotType": "LINE",
+                "legendTemplate": "DENY - ${resource.labels.policy_name}",
+                "minAlignmentPeriod": "60s",
+                "targetAxis": "Y1",
+                "dimensions": [],
+                "measures": [],
+                "breakdowns": []
+              },
+              {
+                "timeSeriesQuery": {
+                  "timeSeriesFilter": {
+                    "filter": "metric.type=\"networksecurity.googleapis.com/https/previewed_request_count\" resource.type=\"network_security_policy\" metric.label.\"blocked\"=\"true\" ${Security_Policy}",
+                    "aggregation": {
+                      "alignmentPeriod": "60s",
+                      "perSeriesAligner": "ALIGN_RATE",
+                      "crossSeriesReducer": "REDUCE_SUM",
+                      "groupByFields": [
+                        "resource.label.\"policy_name\""
+                      ]
+                    }
+                  },
+                  "unitOverride": "",
+                  "outputFullDuration": false
+                },
+                "plotType": "LINE",
+                "legendTemplate": "PREVIEW DENY - ${resource.labels.policy_name}",
+                "minAlignmentPeriod": "60s",
+                "targetAxis": "Y1",
+                "dimensions": [],
+                "measures": [],
+                "breakdowns": []
+              }
+            ],
+            "timeshiftDuration": "604800s",
+            "thresholds": [],
+            "yAxis": {
+              "label": "",
+              "scale": "LINEAR"
+            },
+            "chartOptions": {
+              "mode": "COLOR",
+              "showLegend": false,
+              "displayHorizontal": false
+            }
+          },
+          "title": "Blocked Requests per Policy",
+          "id": ""
+        }
+      },
+      {
+        "yPos": 72,
+        "width": 24,
+        "height": 15,
+        "widget": {
+          "xyChart": {
+            "dataSets": [
+              {
+                "timeSeriesQuery": {
+                  "timeSeriesFilter": {
+                    "filter": "metric.type=\"networksecurity.googleapis.com/https/request_count\" resource.type=\"network_security_policy\" metric.label.\"blocked\"=\"false\" ${Security_Policy}",
+                    "aggregation": {
+                      "alignmentPeriod": "60s",
+                      "perSeriesAligner": "ALIGN_RATE",
+                      "crossSeriesReducer": "REDUCE_SUM",
+                      "groupByFields": [
+                        "resource.label.\"policy_name\""
+                      ]
+                    }
+                  },
+                  "unitOverride": "",
+                  "outputFullDuration": false
+                },
+                "plotType": "LINE",
+                "legendTemplate": "ALLOW - ${resource.labels.policy_name}",
+                "minAlignmentPeriod": "60s",
+                "targetAxis": "Y1",
+                "dimensions": [],
+                "measures": [],
+                "breakdowns": []
               }
             ],
             "thresholds": [],
@@ -491,125 +647,8 @@
             "chartOptions": {
               "mode": "COLOR",
               "showLegend": false,
-              "displayHorizontal": true
+              "displayHorizontal": false
             }
-          },
-          "title": "Top Rules Hits (by rule priority)",
-          "id": ""
-        }
-      },
-      {
-        "xPos": 24,
-        "yPos": 72,
-        "height": 15,
-        "width": 24,
-        "widget": {
-          "xyChart": {
-            "dataSets": [
-              {
-                "timeSeriesQuery": {
-                  "timeSeriesFilter": {
-                    "filter": "metric.type=\"networksecurity.googleapis.com/https/request_count\" resource.type=\"network_security_policy\" metric.label.\"blocked\"=\"true\" ${Security_Policy} ${Backend_name}",
-                    "aggregation": {
-                      "perSeriesAligner": "ALIGN_RATE",
-                      "crossSeriesReducer": "REDUCE_SUM",
-                      "groupByFields": [
-                        "resource.label.\"policy_name\""
-                      ]
-                    }
-                  }
-                },
-                "plotType": "LINE",
-                "targetAxis": "Y1",
-                "minAlignmentPeriod": "60s",
-                "legendTemplate": "DENY - ${resource.labels.policy_name}"
-              },
-              {
-                "timeSeriesQuery": {
-                  "timeSeriesFilter": {
-                    "filter": "metric.type=\"networksecurity.googleapis.com/https/previewed_request_count\" resource.type=\"network_security_policy\" metric.label.\"blocked\"=\"true\" ${Security_Policy} ${Backend_name}",
-                    "aggregation": {
-                      "perSeriesAligner": "ALIGN_RATE",
-                      "crossSeriesReducer": "REDUCE_SUM",
-                      "groupByFields": [
-                        "resource.label.\"policy_name\""
-                      ]
-                    }
-                  }
-                },
-                "plotType": "LINE",
-                "targetAxis": "Y1",
-                "minAlignmentPeriod": "60s",
-                "legendTemplate": "PREVIEW DENY - ${resource.labels.policy_name}"
-              }
-            ],
-            "chartOptions": {
-              "mode": "COLOR",
-              "displayHorizontal": false
-            },
-            "thresholds": [],
-            "yAxis": {
-              "scale": "LINEAR"
-            },
-            "timeshiftDuration": "604800s"
-          },
-          "title": "Blocked Requests per Policy",
-          "id": ""
-        }
-      },
-      {
-        "yPos": 72,
-        "height": 15,
-        "width": 23,
-        "widget": {
-          "xyChart": {
-            "dataSets": [
-              {
-                "timeSeriesQuery": {
-                  "timeSeriesFilter": {
-                    "filter": "metric.type=\"networksecurity.googleapis.com/https/request_count\" resource.type=\"network_security_policy\" metric.label.\"blocked\"=\"false\" ${Security_Policy} ${Backend_name}",
-                    "aggregation": {
-                      "perSeriesAligner": "ALIGN_RATE",
-                      "crossSeriesReducer": "REDUCE_SUM",
-                      "groupByFields": [
-                        "resource.label.\"policy_name\""
-                      ]
-                    }
-                  }
-                },
-                "plotType": "LINE",
-                "targetAxis": "Y1",
-                "minAlignmentPeriod": "60s",
-                "legendTemplate": "ALLOW - ${resource.labels.policy_name}"
-              },
-              {
-                "timeSeriesQuery": {
-                  "timeSeriesFilter": {
-                    "filter": "metric.type=\"networksecurity.googleapis.com/https/previewed_request_count\" resource.type=\"network_security_policy\" metric.label.\"blocked\"=\"false\" ${Security_Policy} ${Backend_name}",
-                    "aggregation": {
-                      "perSeriesAligner": "ALIGN_RATE",
-                      "crossSeriesReducer": "REDUCE_SUM",
-                      "groupByFields": [
-                        "resource.label.\"policy_name\""
-                      ]
-                    }
-                  }
-                },
-                "plotType": "LINE",
-                "targetAxis": "Y1",
-                "minAlignmentPeriod": "60s",
-                "legendTemplate": "PREVIEW ALLOW - ${resource.labels.policy_name}"
-              }
-            ],
-            "chartOptions": {
-              "mode": "COLOR",
-              "displayHorizontal": false
-            },
-            "thresholds": [],
-            "yAxis": {
-              "scale": "LINEAR"
-            },
-            "timeshiftDuration": "604800s"
           },
           "title": "Allowed Requests per Policy",
           "id": ""
@@ -626,8 +665,19 @@
                 "timeSeriesQuery": {
                   "opsAnalyticsQuery": {
                     "savedQueryId": "",
-                    "sql": "SELECT\n  count(timestamp) as Requests , \n -- timestamp,\n  json_value(json_payload.enforcedSecurityPolicy.configuredAction) as Rule_Action,\n    json_value(json_payload.enforcedSecurityPolicy.name) as Security_Policy,\n  --json_payload.previewSecurityPolicy\n  \nFROM\n  `lab-kk.global._Default._AllLogs`\n  where resource.type = 'http_load_balancer' --and severity = 'WARNING'\n  and  json_value(json_payload.enforcedSecurityPolicy.configuredAction) is not NULL\nand\n  IF(\n    ARRAY_LENGTH(@Security_Policy) = 0,\n    TRUE,\n   json_value(json_payload.enforcedSecurityPolicy.name) IN UNNEST(@Security_Policy)\n  )\n  and \n\n  IF(\n    ARRAY_LENGTH(@Backend_name) = 0,\n    TRUE,\n    json_value(resource.labels.backend_service_name) IN UNNEST(@Backend_name)\n  )\n  and\n  IF(\n    ARRAY_LENGTH(@Region_Code) = 0,\n    TRUE,\n    JSON_VALUE(json_payload.securityPolicyRequestData.remoteIpInfo.regionCode) IN UNNEST(@Region_Code)\n  )\n\n\n  group by 2 ,3\norder by Rule_Action desc\n--LIMIT 100",
-                    "queryHandle": ""
+                    "sql": "SELECT\n  count(timestamp) as Requests , \n -- timestamp,\n  json_value(json_payload.enforcedSecurityPolicy.configuredAction) as Rule_Action,\n    json_value(json_payload.enforcedSecurityPolicy.name) as Security_Policy,\n  --json_payload.previewSecurityPolicy\n  \nFROM\n  `lab-kk.global._Default._AllLogs`\n  where resource.type = 'http_load_balancer' --and severity = 'WARNING'\n  and  json_value(json_payload.enforcedSecurityPolicy.configuredAction) is not NULL\nand\n  IF(\n    ARRAY_LENGTH(@Security_Policy) = 0,\n    TRUE,\n   json_value(json_payload.enforcedSecurityPolicy.name) IN UNNEST(@Security_Policy)\n  )\n  and \n\n  IF(\n    ARRAY_LENGTH(@Backend_name) = 0,\n    TRUE,\n    json_value(resource.labels.backend_service_name) IN UNNEST(@Backend_name)\n    --SPLIT(json_value(resource.labels.backend_service_name), \"-backend\")[0]  IN UNNEST(@Backend_name)\n  )\n  and\n  IF(\n    ARRAY_LENGTH(@Region_Code) = 0,\n    TRUE,\n    JSON_VALUE(json_payload.securityPolicyRequestData.remoteIpInfo.regionCode) IN UNNEST(@Region_Code)\n  )\n\n\n  group by 2 ,3\norder by Rule_Action desc\n--LIMIT 100",
+                    "queryHandle": "",
+                    "queryBuilder": {
+                      "resourceNames": [],
+                      "filter": {
+                        "operatorType": "AND",
+                        "expressions": []
+                      },
+                      "fields": [],
+                      "limit": "0",
+                      "orderBys": [],
+                      "searchTerm": ""
+                    }
                   },
                   "unitOverride": "",
                   "outputFullDuration": false
@@ -911,19 +961,22 @@
   },
   "dashboardFilters": [
     {
-      "filterType": "RESOURCE_LABEL",
       "labelKey": "policy_name",
       "templateVariable": "Security_Policy",
+      "filterType": "RESOURCE_LABEL",
       "valueType": "STRING_ARRAY"
     },
     {
-      "filterType": "RESOURCE_LABEL",
       "labelKey": "backend_target_name",
       "templateVariable": "Backend_name",
+      "filterType": "RESOURCE_LABEL",
       "valueType": "STRING_ARRAY"
     },
     {
+      "labelKey": "",
+      "templateVariable": "Region_Code",
       "filterType": "VALUE_ONLY",
+      "valueType": "STRING_ARRAY",
       "stringArray": {
         "values": [
           "AD",
@@ -1176,9 +1229,7 @@
           "ZM",
           "ZW"
         ]
-      },
-      "templateVariable": "Region_Code",
-      "valueType": "STRING_ARRAY"
+      }
     }
   ],
   "labels": {}
