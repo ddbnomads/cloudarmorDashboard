@@ -1,11 +1,11 @@
 # gcloud alpha monitoring policies create --policy-from-file=adaptive_protection_alert.json
 
 {
-  "name": "projects/*/alertPolicies/12220852840272900044/conditions/12220852840272899115",
+  "name": "projects/*/alertPolicies/12220852840272900044",
 "displayName": "adaptive protection alert",
   "conditions": [
     {
-      "name": "projects/*/alertPolicies/12220852840272900044/conditions/12220852840272899115",
+      "name": "projects/*/alertPolicies/12220852840272900044",
       "displayName": "Log match condition",
       "conditionMatchedLog": {
         "filter": "resource.type=\"network_security_policy\"\nseverity=WARNING"
