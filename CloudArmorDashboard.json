@@ -1,3 +1,6 @@
+### replace [projectID] with your project's project ID value ####
+### ensure that you enable Observability Analtyics in your Log Storage repository else the reports won't generate ###
+### it may take up to 24 hours for the reports to generate properly ####
 {
   "displayName": "Cloud Armor WAF Dashboard",
   "dashboardFilters": [
