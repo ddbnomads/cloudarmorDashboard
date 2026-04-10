@@ -1,5 +1,7 @@
 # gcloud alpha monitoring policies create --policy-from-file=adaptive_protection_alert.json
 
+# replace [projectName] with your project name from your GCP tenant
+
 {
   "displayName": "Cloud Armor Adaptive Protection Alert",
   "conditions": [
