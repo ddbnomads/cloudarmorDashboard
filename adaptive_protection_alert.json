@@ -1,14 +1,15 @@
 # gcloud alpha monitoring policies create --policy-from-file=adaptive_protection_alert.json
 
 {
-  "name": "projects/*/alertPolicies/12220852840272900044",
-"displayName": "adaptive protection alert",
+  "displayName": "Cloud Armor Adaptive Protection Alert",
   "conditions": [
     {
-      "name": "projects/*/alertPolicies/12220852840272900044",
-      "displayName": "Log match condition",
+      "displayName": "Adaptive Protection - Attack Detected",
       "conditionMatchedLog": {
-        "filter": "resource.type=\"network_security_policy\"\nseverity=WARNING"
+        "filter": "resource.type=\"network_security_policy\" AND logName=\"projects/reisfeldplayground/logs/networksecurity.googleapis.com%2Fadaptive_protection_events\" AND jsonPayload.threatVerdict.verdict=\"ATTACK\"",
+        "resourceContainers": [
+          "projects/reisfeldplayground"
+        ]
       }
     }
   ],
@@ -20,8 +21,11 @@
   },
   "combiner": "OR",
   "enabled": true,
-  "notificationChannels": [],
-
+  "documentation": {
+    "content": "This alert fires when Cloud Armor Adaptive Protection detects a potential DDoS attack. Check the Cloud Armor monitoring and logs in the reisfeldplayground project for details.",
+    "mimeType": "text/markdown"
   }
+}
+
 
   
