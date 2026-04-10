@@ -22,7 +22,7 @@
   "combiner": "OR",
   "enabled": true,
   "documentation": {
-    "content": "This alert fires when Cloud Armor Adaptive Protection detects a potential DDoS attack. Check the Cloud Armor monitoring and logs in the reisfeldplayground project for details.",
+    "content": "This alert fires when Cloud Armor Adaptive Protection detects a potential DDoS attack. Check the Cloud Armor monitoring and logs in the project for details.",
     "mimeType": "text/markdown"
   }
 }
