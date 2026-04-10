@@ -6,9 +6,9 @@
     {
       "displayName": "Adaptive Protection - Attack Detected",
       "conditionMatchedLog": {
-        "filter": "resource.type=\"network_security_policy\" AND logName=\"projects/reisfeldplayground/logs/networksecurity.googleapis.com%2Fadaptive_protection_events\" AND jsonPayload.threatVerdict.verdict=\"ATTACK\"",
+        "filter": "resource.type=\"network_security_policy\" AND logName=\"projects/[projectName]/logs/networksecurity.googleapis.com%2Fadaptive_protection_events\" AND jsonPayload.threatVerdict.verdict=\"ATTACK\"",
         "resourceContainers": [
-          "projects/reisfeldplayground"
+          "projects/[projectName]"
         ]
       }
     }
